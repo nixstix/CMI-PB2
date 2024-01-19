@@ -1,0 +1,174 @@
+---
+title: "MOFA first pass - process 2021 data"
+#date: "Last update: `r format(Sys.time(), '%d %B, %Y')`" 
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_float:
+        collapsed: true
+        smooth_scroll: true
+    toc_depth: 3
+    fig_caption: yes
+    code_folding: show
+    number_sections: false
+date: "2024-01-05"
+---
+
+
+## load data
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = '~/Documents/Projects/CMI-PB-2ndChallenge/MOFA/')
+```
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+
+source('../scripts/libs.R')
+```
+
+```{r}
+load('../data/processed_datasets/training_dataset/train_2021_dataset.RData')     
+lapply(train_data,dim)
+lapply(train_data,class)
+
+```
+## filter samples
+
+we want to remove samples with a majority of NAs in them (per view/assay)
+
+```{r}
+# filter some of our samples
+train_data$meta$exp = colSums(train_data$geneExp)
+train_data$meta$ab = colSums(train_data$ab)
+train_data$meta$cytokine = colSums(train_data$cytokine)
+train_data$meta$cell_freq = colSums(train_data$cell_freq)
+
+```
+
+```{r}
+train_data$meta$sums = rowSums(is.na(train_data$meta[, 15:18]))
+colSums(is.na(train_data$meta[, 15:18]))
+table(train_data$meta$sums)
+```
+
+```{r}
+sampleIdx = train_data$meta[train_data$meta$sums < 4, 'Meta.specimen_id']
+colSums(is.na(train_data$meta[, 15:18]))
+sum(colSums(is.na(train_data$meta[, 15:18]))) # total nr NAs
+
+nrow(train_data$meta)*4
+
+dim(sampleIdx)
+```
+
+filter:
+```{r}
+dim(sampleIdx)
+
+train_data$meta = train_data$meta[train_data$meta$Meta.specimen_id %in% sampleIdx$Meta.specimen_id, ]
+train_data$geneExp = train_data$geneExp[, colnames(train_data$geneExp) %in% sampleIdx$Meta.specimen_id] 
+train_data$ab = train_data$ab[, colnames(train_data$ab) %in% sampleIdx$Meta.specimen_id] 
+train_data$cytokine = train_data$cytokine[, colnames(train_data$cytokine) %in% sampleIdx$Meta.specimen_id] 
+train_data$cell_freq = train_data$cell_freq[, colnames(train_data$cell_freq) %in% sampleIdx$Meta.specimen_id] 
+
+lapply(train_data, dim)
+```
+
+```{r}
+sum(colSums(is.na(train_data$meta[, 15:18]))) # total nr NAs
+```
+
+```{r}
+unique(train_data$meta$Meta.subject_id) # nr subjects
+```
+
+## prepare MOFA
+
+```{r}
+MOFAobject <- create_mofa(train_data[c(2:5)])
+MOFAobject
+plot_data_overview(MOFAobject, show_dimensions = T)
+
+```
+
+### set options
+
+```{r}
+data_opts <- get_default_data_options(MOFAobject)
+data_opts$scale_views = FALSE
+data_opts
+
+model_opts <- get_default_model_options(MOFAobject)
+model_opts$num_factors <- 15
+
+model_opts
+
+train_opts <- get_default_training_options(MOFAobject)
+train_opts$convergence_mode <- "medium"
+train_opts$seed <- 42
+
+train_opts
+
+stochastic_opts = get_default_stochastic_options(MOFAobject)
+
+mefisto_opts = get_default_mefisto_options(MOFAobject)
+```
+
+```{r}
+
+MOFAobject <- prepare_mofa(MOFAobject,
+                           data_options = data_opts,
+                           model_options = model_opts,
+                           training_options = train_opts,
+                           #stochastic_options = stochastic_opts,
+                           mefisto_options = mefisto_opts
+)
+```
+
+### add metadata
+
+clinical data
+```{r}
+train_data$meta$sample = train_data$meta$Meta.specimen_id
+```
+
+```{r}
+d = cbind(train_data$meta, t(train_data$geneExp), t(train_data$ab), 
+          t(train_data$cytokine), t(train_data$cell_freq))
+```
+
+```{r}
+samples_metadata(MOFAobject) <- d
+```
+
+
+## run MOFA
+
+```{r}
+
+# run MOFA
+MOFAobject <- run_mofa(MOFAobject, outfile="../data/MOFA_models//MOFA2_noScale_train2021.hdf5", use_basilisk = TRUE)
+MOFAobject
+
+```
+
+```{r}
+plot_factor_cor(MOFAobject)
+
+plot_variance_explained(MOFAobject, max_r2=80)
+plot_variance_explained(MOFAobject, max_r2=20)
+plot_variance_explained(MOFAobject, max_r2=10)
+
+plot_variance_explained(MOFAobject, plot_total = T)[[2]]
+```
+
+
+## session_info()
+
+```{r}
+Sys.Date()
+getwd()
+
+sessioninfo::session_info()
+
+```

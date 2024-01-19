@@ -1,0 +1,204 @@
+---
+title: "MOFA first pass - process 2021 data: explore"
+#date: "Last update: `r format(Sys.time(), '%d %B, %Y')`" 
+output:
+  BiocStyle::html_document:
+    toc: true
+    toc_float:
+        collapsed: true
+        smooth_scroll: true
+    toc_depth: 3
+    fig_caption: yes
+    code_folding: show
+    number_sections: false
+date: "2024-01-05"
+---
+
+
+## load data
+
+```{r, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = '~/Documents/Projects/CMI-PB-2ndChallenge/MOFA/')
+```
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+
+source('../scripts/libs.R')
+```
+
+```{r}
+MOFAobject=load_model('../data/MOFA_models/MOFA2_noScale_train2021.hdf5')     
+MOFAobject
+
+```
+
+keep potentially interesting assay features to one side:
+```{r}
+tasks_ab<-c('IgG_PT','IgG_FHA','IgG_PRN','IgG1_PT','IgG1_FHA','IgG1_PRN','IgG4_PT','IgG4_FHA','IgG4_PRN', 'IgG1_TT')
+tasks_cell_freq<-c('Freq.Monocytes','Freq.CD4Tcells')
+tasks_seq<-c('Expr.ENSG00000277632.1','Expr.ENSG00000100906.10', 'Expr.ENSG00000118564.14')
+tasks_cytokine = c('Cytokine.P10147')
+```
+
+
+```{r}
+
+correlate_factors_with_covariates(MOFAobject, 
+                                  covariates = c("Meta.subject_id","Meta.infancy_vac","Meta.biological_sex", "Meta.timepoint"), 
+                                  plot="log_pval"
+)                                  
+                                  correlate_factors_with_covariates(MOFAobject, 
+                                  covariates = c("Meta.subject_id","Meta.infancy_vac","Meta.biological_sex", "Meta.timepoint"), 
+                                  plot=c("r")
+)
+
+```
+
+```{r}
+
+plot_factor(MOFAobject, 
+            factors = 7, 
+            color_by = "Meta.infancy_vac"
+)
+```
+
+```{r}
+plot_top_weights(MOFAobject,
+                 view = "geneExp",
+                 factor = 7,
+                 nfeatures = 10,     # Top number of features to highlight
+                 scale = T           # Scale weights from -1 to 1
+)
+
+plot_top_weights(MOFAobject,
+                 view = "ab",
+                 factor = 7,
+                 nfeatures = 10,     # Top number of features to highlight
+                 scale = T           # Scale weights from -1 to 1
+)
+
+plot_weights(MOFAobject,
+  view = "geneExp",
+  factor = 7,
+  nfeatures = 10,     # Number of features to highlight
+  scale = T,          # Scale weights from -1 to 1
+  abs = F             # Take the absolute value?
+)
+```
+
+
+
+```{r}
+Z <- get_factors(MOFAobject)$group1
+Z[1:5, 1:5]
+dim(Z)
+```
+
+```{r}
+
+
+correlate_factors_with_covariates(MOFAobject, 
+                                  covariates = tasks_ab, 
+                                  plot=c("log_pval")
+)
+
+correlate_factors_with_covariates(MOFAobject, 
+                                  covariates = tasks_ab, 
+                                  plot=c("r")
+)
+
+correlate_factors_with_covariates(MOFAobject, 
+                                  covariates = tasks_cell_freq, 
+                                  plot=c("log_pval")
+)
+
+correlate_factors_with_covariates(MOFAobject, 
+                                  covariates = tasks_cell_freq, 
+                                  plot=c("r")
+)
+
+
+correlate_factors_with_covariates(MOFAobject, 
+                                  covariates = tasks_seq, 
+                                  plot=c("log_pval")
+)
+
+correlate_factors_with_covariates(MOFAobject, 
+                                  covariates = tasks_seq, 
+                                  plot=c("r")
+)
+```
+
+```{r}
+## where is CCL3 
+weights <- get_weights(MOFAobject, 
+                       views = "geneExp", 
+                       factors = "all", 
+                       as.data.frame = TRUE 
+)
+
+weights[grep('ENSG00000277632', weights$feature),]
+
+
+weights <- get_weights(MOFAobject, 
+                       views = "cytokine", 
+                       factors = "all", 
+                       as.data.frame = TRUE 
+)
+
+
+weights[grep('P10147', weights$feature),]
+## factor 3, 10
+
+weights <- get_weights(MOFAobject, 
+                       views = "ab", 
+                       factors = "all", 
+                       as.data.frame = TRUE 
+)
+```
+
+```{r}
+z=weights[grep('IgG_PT', weights$feature),]
+z[order(z$value),]
+
+plot_top_weights(MOFAobject,
+                 view = "geneExp",
+                 factor = 3,
+                 nfeatures = 10,     # Top number of features to highlight
+                 scale = T           # Scale weights from -1 to 1
+)
+
+plot_top_weights(MOFAobject,
+                 view = "ab",
+                 factor = 6,
+                 nfeatures = 10,     # Top number of features to highlight
+                 scale = T           # Scale weights from -1 to 1
+)
+```
+
+```{r}
+plot_top_weights(MOFAobject,
+                 view = "cytokine",
+                 factor = 3,
+                 nfeatures = 10,     # Top number of features to highlight
+                 scale = T           # Scale weights from -1 to 1
+)
+
+plot_top_weights(MOFAobject,
+                 view = "cytokine",
+                 factor = 10,
+                 nfeatures = 10,     # Top number of features to highlight
+                 scale = T           # Scale weights from -1 to 1
+)
+```
+
+
+## session_info()
+
+```{r}
+Sys.Date()
+getwd()
+
+sessioninfo::session_info()
+
+```
