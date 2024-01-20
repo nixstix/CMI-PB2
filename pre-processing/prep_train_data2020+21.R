@@ -137,4 +137,4 @@ save(train_data, file='../data/processed_datasets/training_dataset/train_2020+21
 
 train_data = test_data
 
-save(test_data, file='../data/processed_datasets/training_dataset/train_2020+21_TEST.RData')
+save(train_data, file='../data/processed_datasets/training_dataset/train_2020+21_TEST.RData')
