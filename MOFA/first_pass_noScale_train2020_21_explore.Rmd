@@ -18,7 +18,7 @@ date: "2024-01-05"
 ## load data
 
 ```{r, setup, include=FALSE}
-knitr::opts_knit$set(root.dir = '~/Documents/Projects/CMI-PB-Oct2023-FINAL/MOFA_firstpass/')
+knitr::opts_knit$set(root.dir = '~/Documents/Projects/CMI-PB-2ndChallenge/MOFA/')
 ```
 
 ```{r message=FALSE, warning=FALSE, paged.print=TRUE}
@@ -27,7 +27,7 @@ source('../scripts/libs.R')
 ```
 
 ```{r}
-MOFAobject=load_model('../data/models/MOFA2_noScale_train2020_21.hdf5')     
+MOFAobject=load_model('../data/MOFA_models/MOFA2_noScale_train2020_21.hdf5')     
 MOFAobject
 
 ```
