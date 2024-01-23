@@ -108,7 +108,7 @@ save(train_data, file = '../data/processed_datasets/training_dataset/train_2020+
 idx = unique(train_data$meta$Meta.subject_id)
 idx
 length(idx)
-test.idx = sample(train_data$meta$Meta.subject_id, 0.2*length(idx),replace=FALSE)
+test.idx = sample(train_data$meta$Meta.subject_id, 0.40*length(idx),replace=FALSE)
 test.idx = as.vector(train_data$meta[train_data$meta$Meta.subject_id %in% test.idx, 'Meta.specimen_id'])[[1]]
 train.idx = as.vector(train_data$meta[!train_data$meta$Meta.specimen_id %in% test.idx, 'Meta.specimen_id'])[[1]]
                                                                                                             

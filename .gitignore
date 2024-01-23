@@ -1,7 +1,9 @@
 # Mac-specific
 */.DS_Store
+.DS_Store
 
 # History files
+*/.Rhistory
 .Rhistory
 .Rapp.history
 
@@ -23,6 +25,8 @@
 
 # RStudio files
 .Rproj.user/
+*.Rproj
+*/*.Rproj
 
 # produced vignettes
 vignettes/*.html
