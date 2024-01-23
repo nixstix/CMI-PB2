@@ -21,35 +21,29 @@ test_data_tform[1:30, 1:5]
 # format test matrix:
 test_data_tform = format_test_matrix(test_data_tform, test_data)
 
-# day 1
-test_data.day1 = test_data_tform[test_data_tform$Meta.timepoint == 1, ]
-rownames(test_data.day3) = test_data.day3$Meta.subject_id
-test_data.day3[1:15, 1:5]
-dim(test_data.day1)
-
-# day 3
-test_data.day3 = test_data_tform[test_data_tform$Meta.timepoint == 3, ]
-rownames(test_data.day3) = test_data.day3$Meta.subject_id
-test_data.day3[1:15, 1:5]
-dim(test_data.day3)
-
-# day 14
-test_data.day14 = test_data_tform[test_data_tform$Meta.timepoint == 14, ]
-rownames(test_data.day14) = test_data.day3$Meta.subject_id
-test_data.day3[1:15, 1:5]
-dim(test_data.day14)
-
 # baseline day0 
 test_data.baseline = test_data_tform[test_data_tform$Meta.timepoint == 0 , ]
 rownames(test_data.baseline) = test_data.baseline$Meta.subject_id
-test_data.baseline[1:5, 1:5]
 colnames(test_data.baseline) = paste('Day0.', colnames(test_data.baseline), sep='') 
+test_data.baseline[1:50, 1:5]
+
+# Freq Mn at Day 1
+p = test_data_tform[test_data_tform$Meta.timepoint == 1, ]
+rownames(p) = p$Meta.subject_id
+test_data.baseline$Freq.Monocytes = p[rownames(test_data.baseline), 'Freq.Monocytes']
+
+# CCL3 at Day 3
+p = test_data_tform[test_data_tform$Meta.timepoint == 3, ]
+rownames(p) = p$Meta.subject_id
+test_data.baseline$CCL3 = p[rownames(test_data.baseline), 'Expr.ENSG00000277632.1']
 
 
-save(test_data.baseline, test_data.day1, test_data.day3, test_data.day14, file='../test_2022.RData')
+# IgG_PT at Day 14
+p = test_data_tform[test_data_tform$Meta.timepoint == 14, ]
+rownames(p) = p$Meta.subject_id
+test_data.baseline$IgG_PT = p[rownames(test_data.baseline), 'IgG_PT']
 
 
+save(test_data.baseline, file='../test_2022.RData')
 
-dim(test_data.baseline)
-dim(test_data.day3)
-dim(test_data.day14)
+

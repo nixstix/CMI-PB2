@@ -19,7 +19,7 @@ Additional R functions and libraries are loaded from the `scripts` folder
 
 #### Pre-processing
 
-The input data is first processed in such a way as to make it compatible with MOFA -- ensuring each assay (view) has the same number of samples (filled in with NA). We also only select 5000 genes (the most highly variable genes) to try to balance the gene expression data with the other assays that have fewer features (gene expression data is renormalised and where necessary batch-correct). We split the 2020+2021 dataset into training and testing data (80-20). These steps are available here: `pre-processing` for each of : 2020, 2021, 2022, 2020+2021-TRAIN, and 2020+2021-TEST
+The input data is first processed in such a way as to make it compatible with MOFA -- ensuring each assay (view) has the same number of samples (filled in with NA). We also only select 5000 genes (the most highly variable genes) to try to balance the gene expression data with the other assays that have fewer features (gene expression data is renormalised and where necessary batch-correct). We split the 2020+2021 dataset into training and testing data (65-35). These steps are available here: `pre-processing` for each of : 2020, 2021, 2022, 2020+2021-TRAIN, and 2020+2021-TEST
 
 #### Running MOFA
 
@@ -28,3 +28,10 @@ Scripts to run MOFA may be found in `MOFA`. We integrated assay data from the 20
 We also tried running MOFA, scaling each view, however, performance often appeared worse after the scaling.
 
 #### Model building and predictions
+
+Models were built using two datasets: 2021 (then tested on 2020) ; 2020+2020 TRAIN (then trained on 2020+2021 TEST). Finally, predictions were run on the 2022 data. Scripts prepare the training and test data, build models, and run predictions are in `predictions2020` and `predictions2020+21`. Data associated with predictions are available in `predictions2020/data` and `predictions2020+21/data`
+
+Models were built using LASSO regression. 
+
+
+

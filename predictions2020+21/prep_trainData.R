@@ -1,5 +1,4 @@
-# here we will use the 2021 data as training data, and test models on the 2021 data
-# then use this model to predict 2022 tasks
+
 
 source('../scripts/libs.R')
 source('../scripts/generic_prediction_functions.R')
@@ -23,6 +22,29 @@ colnames(predictors.baseline) = paste('Day0.', colnames(predictors.baseline), se
 dim(predictors.baseline)
 predictors.baseline[1:5, 1:5]
 
+# extract tasks
+# -------------
+
+# Freq Mn at Day 1
+p = predictors[predictors$Meta.timepoint == 1, ]
+rownames(p) = p$Meta.subject_id
+predictors.baseline$Freq.Monocytes = p[rownames(predictors.baseline), 'Freq.Monocytes']
+
+# CCL3 at Day 3
+p = predictors[predictors$Meta.timepoint == 3, ]
+rownames(p) = p$Meta.subject_id
+predictors.baseline$CCL3 = p[rownames(predictors.baseline), 'Expr.ENSG00000277632.1']
+
+
+# IgG_PT at Day 14
+p = predictors[predictors$Meta.timepoint == 14, ]
+rownames(p) = p$Meta.subject_id
+predictors.baseline$IgG_PT = p[rownames(predictors.baseline), 'IgG_PT']
+
+
+
+# save
+# ----
 
 save(predictors.baseline, file='data/predictors.RData')
 
