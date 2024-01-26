@@ -19,7 +19,9 @@ load('data/test_2020.RData')
 
 # use demographic data, as well as assay data that should be highly predictive of the prediction task
 
-features = c("Day0.Expr.ENSG00000277632.1",'Day0.infancy_vac')
+#features = c("Day0.Expr.ENSG00000277632.1",'Day0.infancy_vac')
+features = c("Day0.Expr.ENSG00000277632.1", 'Day0.Meta.year_of_birth', 'Day0.Cytokine.P10147')
+
 model1 = run_glmnet(p = features, task.name = 'CCL3', alpha=1)
 model1$model_cor
 
@@ -52,32 +54,38 @@ model4 = run_glmnet(p = p.int, task.name = 'CCL3', alpha=1)
 model4$model_cor
 model4$model_coef
 
-
-# different alphas
-p.int = c(features, 'Day0.Factor15', 'Day0.Factor11', 'Day0.Cytokine.P10147')
-model5 = run_glmnet(p = p.int, task.name = 'CCL3', alpha=0)
+# select features predicted by MOFA
+p.int = c(features, 'Day0.Factor3')
+model5 = run_glmnet(p = p.int, task.name = 'CCL3', alpha=1)
 model5$model_cor
 model5$model_coef
 
+
 # different alphas
 p.int = c(features, 'Day0.Factor15', 'Day0.Factor11', 'Day0.Cytokine.P10147')
-model6 = run_glmnet(p = p.int, task.name = 'CCL3', alpha=0.5)
+model6 = run_glmnet(p = p.int, task.name = 'CCL3', alpha=0)
 model6$model_cor
 model6$model_coef
+
+# different alphas
+p.int = c(features, 'Day0.Factor15', 'Day0.Factor11', 'Day0.Cytokine.P10147')
+model7 = run_glmnet(p = p.int, task.name = 'CCL3', alpha=0.5)
+model7$model_cor
+model7$model_coef
 
 
 # fold change
 predictors.baseline$fc = predictors.baseline$CCL3/predictors.baseline$Day0.Expr.ENSG00000277632.1
 test_data.baseline$fc = test_data.baseline$CCL3 / test_data.baseline$Day0.Expr.ENSG00000277632.1
 
-p.int = c(features, 'Day0.Factor15', 'Day0.Factor11', 'Day0.Cytokine.P10147')
+p.int = c(features, 'Day0.Factor3')
 model_fc = run_glmnet(p = p.int, task.name = 'fc', alpha=0)
 model_fc$model_cor
 
 
 # save best models plus baseline
 # ------------------------------
-save(model5, model3, model1, model_fc, file='data/regression_models.RData')
+save(model5, model3, model1, model4, model_fc, file='data/regression_models_CCL3.RData')
 
 
 # predict on 2022 data
@@ -86,9 +94,7 @@ save(model5, model3, model1, model_fc, file='data/regression_models.RData')
 
 load('data/test_2022.RData')
 
-p = names(model5$model_coef)
-p = p[!p %in% '(Intercept)']
-p
+p = c(features, 'Day0.Factor3')
 new_data = na.omit(test_data.baseline[,p])
 dim(new_data)
 
