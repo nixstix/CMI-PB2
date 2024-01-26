@@ -20,8 +20,9 @@ run_glmnet = function(p=features, task.name='' ,alpha=1){
                      lambda = NULL,
                      task, family='gaussian',
                      alpha=alpha,
-                     nfolds=nrow(predictors.rmNA)-1,
-                     type.measure="mse") 
+                     nfolds=nrow(predictors.rmNA),
+                     type.measure="mse", 
+                     standardize = TRUE) 
     
     model_coef=coef(model, s = 'lambda.min')[coef(model, s = 'lambda.min')[,1]!= 0]
     names(model_coef)=rownames(coef(model, s = 'lambda.min'))[coef(model, s = 'lambda.min')[,1]!= 0]
