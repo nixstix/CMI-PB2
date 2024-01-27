@@ -56,11 +56,14 @@ dds = estimateSizeFactors(dds)
 vsd <- vst(dds, blind=TRUE)
 dim(assay(vsd))
 
-plotPCA(vsd, "dataset") # PCA before
+vsd$subject_id = as.factor(vsd$subject_id)
+
+bef_noHVF1 = plotPCA(vsd, "dataset") # PCA before
+bef_noHVF2 = plotPCA(vsd, "subject_id") # PCA before
 
 assay(vsd) <- limma::removeBatchEffect(assay(vsd), batch=as.vector(dds$dataset))
-plotPCA(vsd, "dataset")
-
+aft_noHVF1 = plotPCA(vsd, "dataset")
+aft_noHVF2 = plotPCA(vsd, "subject_id")
 
 # mofa is being dominated by factor 1, this may be a result of poor normalisation, therefore let's limit the geneset even further, based on HVG
 topVarGenes <- head(order(rowVars(assay(vsd)),decreasing=TRUE),5000)
@@ -72,10 +75,11 @@ dds = estimateSizeFactors(dds)
 vsd <- vst(dds, blind=TRUE)
 dim(assay(vsd))
 
-plotPCA(vsd, "dataset") # PCA before
+bef_plusHVF=plotPCA(vsd, "dataset") # PCA before
 
 assay(vsd) <- limma::removeBatchEffect(assay(vsd), batch=as.vector(dds$dataset))
-plotPCA(vsd, "dataset")
+
+aft_plusHVF=plotPCA(vsd, "dataset")
 
 
 
@@ -108,6 +112,7 @@ save(train_data, file = '../data/processed_datasets/training_dataset/train_2020+
 idx = unique(train_data$meta$Meta.subject_id)
 idx
 length(idx)
+set.seed(42)
 test.idx = sample(train_data$meta$Meta.subject_id, 0.40*length(idx),replace=FALSE)
 test.idx = as.vector(train_data$meta[train_data$meta$Meta.subject_id %in% test.idx, 'Meta.specimen_id'])[[1]]
 train.idx = as.vector(train_data$meta[!train_data$meta$Meta.specimen_id %in% test.idx, 'Meta.specimen_id'])[[1]]

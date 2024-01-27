@@ -116,7 +116,7 @@ weights <- get_weights(MOFAobject,
 
 plot_top_weights(MOFAobject,
                  view = "geneExp",
-                 factor = 1,
+                 factor = 10,
                  nfeatures = 10,     # Top number of features to highlight
                  scale = T           # Scale weights from -1 to 1
 )

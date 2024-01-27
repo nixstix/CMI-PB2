@@ -1,4 +1,4 @@
-# here we want to transform our 2020 data using our 2021 MOFA model
+# here we want to transform our 2020+21 TEST data using our 2020+21 MOFA model
 
 source('../scripts/libs.R')
 source('../scripts/generic_prediction_functions.R')
@@ -25,7 +25,7 @@ test_data_tform = format_test_matrix(test_data_tform, test_data)
 test_data.baseline = test_data_tform[test_data_tform$Meta.timepoint == 0 , ]
 rownames(test_data.baseline) = test_data.baseline$Meta.subject_id
 colnames(test_data.baseline) = paste('Day0.', colnames(test_data.baseline), sep='') 
-test_data.baseline[1:50, 1:5]
+test_data.baseline[, 1:5]
 
 # Freq Mn at Day 1
 p = test_data_tform[test_data_tform$Meta.timepoint == 1, ]
@@ -44,6 +44,5 @@ rownames(p) = p$Meta.subject_id
 test_data.baseline$IgG_PT = p[rownames(test_data.baseline), 'IgG_PT']
 
 
-save(test_data.baseline, file='../test_2022.RData')
-
+save(test_data.baseline, file='data/test_2022.RData')
 

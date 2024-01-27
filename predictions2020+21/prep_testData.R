@@ -1,4 +1,4 @@
-# here we want to transform our 2020 data using our 2021 MOFA model
+# here we want to transform our 2020+21 TEST data using our 2020_21 TRAIN MOFA model
 
 source('../scripts/libs.R')
 source('../scripts/generic_prediction_functions.R')

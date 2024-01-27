@@ -74,14 +74,14 @@ model7$model_coef
 # fold change
 predictors.baseline$fc = predictors.baseline$Freq.Monocytes/predictors.baseline$Day0.Freq.Monocytes
 test_data.baseline$fc = test_data.baseline$Freq.Monocytes / test_data.baseline$Day0.Freq.Monocytes
-p.int = c(features,'Day0.Factor5', 'Day0.Factor7', 'Day0.Expr.ENSG00000146070.16')
-model_fc = run_glmnet(p = p.int, task.name = 'fc', alpha=0)
+p.fc = c(features,'Day0.Factor5', 'Day0.Factor7', 'Day0.Expr.ENSG00000146070.16')
+model_fc = run_glmnet(p = p.fc, task.name = 'fc', alpha=0)
 model_fc$model_cor
 
 
 # save best models plus baseline
 # ------------------------------
-save(model5, model7, model1, model_fc, file='data/regression_models_Mn.RData')
+save(model5, model7, model1, model_fc, model3, file='data/regression_models_Mn.RData')
 
 
 # predict on 2022 data
@@ -90,13 +90,12 @@ save(model5, model7, model1, model_fc, file='data/regression_models_Mn.RData')
 
 load('data/test_2022.RData')
 
-p = names(model5$model_coef)
-p = p[!p %in% '(Intercept)']
-p
+#p = c(features,'Day0.Factor5', 'Day0.Factor7', 'Day0.Expr.ENSG00000146070.16')
+p = c(features,'Day0.Factor10', 'Day0.Factor7')
 new_data = na.omit(test_data.baseline[,p])
 dim(new_data)
 
-preds<-data.frame(predict(model5$model,newx=as.matrix(new_data), s='lambda.min'))
+preds<-data.frame(predict(model3$model,newx=as.matrix(new_data), s='lambda.min'))
 preds
 preds$rnk = rank(-preds$lambda.min)
 preds$Subject.ID = as.character(rownames(preds))
@@ -104,6 +103,7 @@ preds
 
 # fold change predictions
 
+new_data = na.omit(test_data.baseline[,p.fc])
 preds_fc<-data.frame(predict(model_fc$model,newx=as.matrix(new_data), s='lambda.min'))
 preds_fc
 preds_fc$rnk_fc = rank(-preds_fc$lambda.min)

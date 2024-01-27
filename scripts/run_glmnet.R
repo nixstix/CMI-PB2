@@ -33,9 +33,10 @@ run_glmnet = function(p=features, task.name='' ,alpha=1){
     # make predictions on 2021 data
     
     preds<-data.frame(predict(model,newx=as.matrix(test_data.baseline[,p]),s='lambda.min'))
-    preds$rnk = rank(-preds$lambda.min)
-    preds$actual = test_data.baseline[, task.name]
     preds = na.omit(preds)
+    preds$rnk = rank(-preds$lambda.min)
+    preds$actual = test_data.baseline[rownames(preds), task.name]
+    
     
     
     cor(preds$rnk, preds$actual, method = 'spearman')
