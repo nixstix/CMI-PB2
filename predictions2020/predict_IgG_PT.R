@@ -63,8 +63,10 @@ model5$model_coef
 # fold change
 predictors.baseline$fc = predictors.baseline$IgG_PT/predictors.baseline$Day0.IgG_PT
 test_data.baseline$fc = test_data.baseline$IgG_PT / test_data.baseline$IgG_PT
-p.int = c(features,'Day0.Factor8', 'Day0.Factor13', 'Day0.Factor6')
-model_fc = run_glmnet(p = p.int, task.name = 'fc', alpha=0)
+p.fc = c(features, f)
+p.fc = c(features,'Day0.IgG1_PT', 'Day0.Factor9')
+
+model_fc = run_glmnet(p = p.fc, task.name = 'fc', alpha=0)
 model_fc$model_cor
 model_fc$preds
 
@@ -93,6 +95,7 @@ preds
 
 # fold change predictions
 
+new_data = na.omit(test_data.baseline[,p.fc])
 preds_fc<-data.frame(predict(model_fc$model,newx=as.matrix(new_data), s='lambda.min'))
 preds_fc
 preds_fc$rnk_fc = rank(-preds_fc$lambda.min)
