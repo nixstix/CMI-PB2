@@ -47,6 +47,8 @@ meta = left_join(meta, rownames_to_column(x), by=c(  "Meta.specimen_id" = "rowna
 
 # expression
 
+## NOTE: in a normal workflow, the input for this section should not be batch-corrected or TPM data, but raw count data. If raw count data is not available, the batch-corrected data can be directly fed into MOFA without any kind of filtering or transformation.
+
 counts_long = dat$pbmc_gene_expression$raw_from_database
 head(counts_long)
 
