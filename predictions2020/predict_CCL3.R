@@ -82,6 +82,10 @@ p.int = c(features, 'Day0.Factor3')
 model_fc = run_glmnet(p = p.int, task.name = 'fc', alpha=0)
 model_fc$model_cor
 
+p.int = c(features)
+model_fc_bl = run_glmnet(p = p.int, task.name = 'fc', alpha=0)
+model_fc$model_cor
+
 
 # save best models plus baseline
 # ------------------------------
@@ -122,4 +126,4 @@ x= left_join(samples_to_predict[,c(1:3)], preds)
 x= left_join(x, preds_fc, by='Subject.ID')
 
 x
-write.table(x, file='data/CCL3_results.tsv', sep='\t', quote = F, row.names = T, col.names = NA)
+write.table(x, file='data/results_CCL3.tsv', sep='\t', quote = F, row.names = T, col.names = NA)

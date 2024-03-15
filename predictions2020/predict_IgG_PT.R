@@ -63,8 +63,10 @@ model5$model_coef
 # fold change
 predictors.baseline$fc = predictors.baseline$IgG_PT/predictors.baseline$Day0.IgG_PT
 test_data.baseline$fc = test_data.baseline$IgG_PT / test_data.baseline$IgG_PT
-p.fc = c(features, f)
-p.fc = c(features,'Day0.IgG1_PT', 'Day0.Factor9')
+#p.fc =c(features)
+#p.fc = c(features, f)
+#p.fc = c(features,'Day0.IgG1_PT', 'Day0.Factor8')
+p.fc = c("Day0.IgG_PT","Day0.Meta.year_of_birth", "Day0.Factor9")
 
 model_fc = run_glmnet(p = p.fc, task.name = 'fc', alpha=0)
 model_fc$model_cor
@@ -81,13 +83,15 @@ save(model4, model1, model_fc, file='data/regression_models_IgG_PT.RData')
 
 load('data/test_2022.RData')
 
-p = names(model4$model_coef)
-p = p[!p %in% '(Intercept)']
-p
+#p = names(model4$model_coef)
+#p = p[!p %in% '(Intercept)']
+#p
+
+p = c("Day0.IgG_PT", 'Day0.Meta.year_of_birth')
 new_data = na.omit(test_data.baseline[,p])
 dim(new_data)
 
-preds<-data.frame(predict(model5$model,newx=as.matrix(new_data), s='lambda.min'))
+preds<-data.frame(predict(model1$model,newx=as.matrix(new_data), s='lambda.min'))
 preds
 preds$rnk = rank(-preds$lambda.min)
 preds$Subject.ID = as.character(rownames(preds))
